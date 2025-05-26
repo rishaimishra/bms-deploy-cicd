@@ -18,7 +18,7 @@ jobs:
 
       - name: SSH and Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ssh_key ubuntu@3.108.220.26 << 'EOF'
+          ssh -tt -o StrictHostKeyChecking=no -i ssh_key ubuntu@3.108.220.26 << 'EOF'
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
