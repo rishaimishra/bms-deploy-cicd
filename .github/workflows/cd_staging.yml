@@ -19,14 +19,22 @@ jobs:
       - name: SSH and Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ssh_key ubuntu@3.108.220.26 << 'EOF'
-            npm install -g pnpm
-            source ~/.bashrc
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
             cd bms-deploy-cicd/
+
             git pull origin main
+
+            # Ensure pnpm and pm2 are available (skip if already installed)
+            command -v pnpm >/dev/null 2>&1 || npm install -g pnpm
+            command -v pm2 >/dev/null 2>&1 || npm install -g pm2
+
             pnpm install
             pnpm run build
-            pm2 restart fe-server-dev
-            pm2 restart http-server-dev
-            pm2 restart ws-server-dev
-          EOF
 
+            pm2 restart fe-server-dev || pm2 start ecosystem.config.js --only fe-server-dev
+            pm2 restart http-server-dev || pm2 start ecosystem.config.js --only http-server-dev
+            pm2 restart ws-server-dev || pm2 start ecosystem.config.js --only ws-server-dev
+          EOF
