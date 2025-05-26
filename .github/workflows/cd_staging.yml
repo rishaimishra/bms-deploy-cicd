@@ -19,6 +19,7 @@ jobs:
       - name: SSH and Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ssh_key ubuntu@3.108.220.26 << 'EOF'
+            source ~/.bashrc
             cd bms-deploy-cicd/
             git pull
             pnpm install
@@ -27,3 +28,4 @@ jobs:
             pm2 restart http-server-dev
             pm2 restart ws-server-dev
           EOF
+
