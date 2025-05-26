@@ -8,12 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     name: Redeploy everything to Staging
     steps:
-     - run: |
-          echo "${{ secrets.SSH_PVT_KEY }}" &> ~/ssh_key
-          ssh -i ~/ssh_key ubuntu@3.108.220.26
-          cd bms-deploy-cicd/ && git pull
-          pnpm install
-          pnpm run build
-          pm2 restart fe-server-dev
-          pm2 restart http-server-dev
-          pm2 restart ws-server-dev
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.SSH_PVT_KEY }}" > ssh_key
+          chmod 600 ssh_key
+
+      - name: SSH and Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ssh_key ubuntu@3.108.220.26 << 'EOF'
+            cd bms-deploy-cicd/
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart fe-server-dev
+            pm2 restart http-server-dev
+            pm2 restart ws-server-dev
+          EOF
