@@ -9,7 +9,7 @@ jobs:
     name: Redeploy everything to Staging
     steps:
      - run: |
-          echo ${{ secrets.SSH_PVT_KEY }} &> ~/ssh_key
+          echo "${{ secrets.SSH_PVT_KEY }}" &> ~/ssh_key
           ssh -i ~/ssh_key ubuntu@3.108.220.26
           cd bms-deploy-cicd/ && git pull
           pnpm install
